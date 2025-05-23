@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
+<body class="bg-gray-100 dark:bg-zinc-950 dark:text-white">
     <div class="my-8 mx-8 md:mx-auto max-w-3xl">
         <div class="border-gray-300 border p-2 rounded-md flex gap-2 mb-4">
             <a href="{{ url_for('index') }}" class="text-blue-500">投稿一覧</a>
@@ -16,11 +16,11 @@
             {% if current_user.is_authenticated %}
             <p class="text-gray-500">{{ current_user.username }}としてログイン中</p>
             <div class="border-gray-300 border-l"></div>
-            <a href="{{ url_for('logout') }}" class="text-gray-500">ログアウト</a>
+            <a href="{{ url_for('logout') }}" class="text-gray-500 dark:text-white">ログアウト</a>
             {% else %}
-            <a href="{{ url_for('login_get') }}" class="text-gray-500">ログイン</a>
+            <a href="{{ url_for('login_get') }}" class="text-gray-500 dark:text-white">ログイン</a>
             <div class="border-gray-300 border-l"></div>
-            <a href="{{ url_for('signup_get') }}" class="text-gray-500">新規登録</a>
+            <a href="{{ url_for('signup_get') }}" class="text-gray-500 dark:text-white">新規登録</a>
             {% endif %}
         </div>
         {% block content %}
