@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p class="text-2xl font-bold">投稿一覧</p>
+{% for post in posts %}
+
+<div class="my-6 border-t border-gray-300"></div>
+<div class="px-4">
+    <p class="text-lg font-bold">{{ post[0].title }}</p>
+    <p class="text-sm text-gray-500">{{ post[0].created_at }}</p>
+    <p class="text-sm text-gray-500">{{ post[1].username }}</p>
+    <p class="text-sm text-gray-500">{{ post[0].content }}</p>
+    <a href="{{ url_for('post', post_id=post[0].id) }}" class="text-blue-500">詳細</a>
+</div>
+{% endfor %}
+<div class="flex gap-3">
+    {% if session.get("user_id") %}
+        <a href="{{ url_for('create_get') }}" class="bg-green-500 text-white px-4 py-2 rounded-md mt-4 mx-auto w-full">投稿作成</a>
+    {% endif %}
+</div>
+{% endblock %}

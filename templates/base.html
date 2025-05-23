@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<html>
+
+<head>
+    <title>flaskテスト</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="my-8 mx-8 md:mx-auto max-w-3xl">
+        <div class="border-gray-300 border p-2 rounded-md flex gap-2 mb-4">
+            <a href="{{ url_for('index') }}" class="text-blue-500">投稿一覧</a>
+            <div class="border-gray-300 border-l"></div>
+            {% if current_user.is_authenticated %}
+            <p class="text-gray-500">{{ current_user.username }}としてログイン中</p>
+            <div class="border-gray-300 border-l"></div>
+            <a href="{{ url_for('logout') }}" class="text-gray-500">ログアウト</a>
+            {% else %}
+            <a href="{{ url_for('login_get') }}" class="text-gray-500">ログイン</a>
+            <div class="border-gray-300 border-l"></div>
+            <a href="{{ url_for('signup_get') }}" class="text-gray-500">新規登録</a>
+            {% endif %}
+        </div>
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+
+</html>
