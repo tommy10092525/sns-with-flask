@@ -61,11 +61,9 @@ def load_user(user_id):
     return User.query.filter(User.id==user_id).first()
 
 
-
 @app.route("/")
 def index():
     posts= Post.query.join(User).add_columns(User.username).all()
-    print(posts)
     return render_template("index.html", posts=posts)
 
 @login_required
@@ -111,8 +109,6 @@ def login_post():
     username=request.form.get("username")
     password=request.form.get("password")
     user=User.query.filter(User.username==username).first()
-    print(username,password)
-    print(user)
     if user and user.check_password(password):
         login_user(user)
         return redirect(url_for("index"))
