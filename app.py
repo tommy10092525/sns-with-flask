@@ -111,6 +111,7 @@ def login_post():
     user=User.query.filter(User.username==username).first()
     if user and user.check_password(password):
         login_user(user)
+        session["user_id"]=user.id
         return redirect(url_for("index"))
     else:
         return redirect(url_for("login_get"))
