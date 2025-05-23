@@ -119,6 +119,7 @@ def login_post():
 @app.route("/logout")
 def logout():
     logout_user()
+    session.clear()
     return redirect(url_for("index"))
 
 @app.route("/signup", methods=["GET"])
