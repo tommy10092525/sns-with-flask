@@ -222,9 +222,57 @@ def signup():
     else:
         return render_template("signup.html")
 
-@app.route("/friend")
+@app.route("/friend", methods=["POST","GET"])
+@login_required
 def friend():
-    return render_template("friend.html")
+    """フレンドページを表示する関数"""
+    friends=Friend.query.filter(Friend.user_id==current_user.id).all()
+    friends_list=[]
+    for friend in friends:
+        friend_user=User.query.filter(User.id==friend.friend_id).first()
+        friend_user_dict=friend_user.to_dict()
+        friend_user_dict["friend_id"]=friend.friend_id
+        friend_user_dict["user_id"]=friend.user_id
+        friend_user_dict["created_at"]=friend.created_at.strftime("%Y-%m-%d %H:%M:%S")  
+        friends_list.append(friend_user_dict)
+    return render_template("friend.html", friends=friends_list)
+
+@app.route("/friend/<uuid:friend_id>", methods=["POST"])
+@login_required
+def friend_add(friend_id):
+    """フレンドを追加する関数"""
+    friend_id=str(friend_id)
+    db.session.add(Friend(user_id=current_user.id, friend_id=friend_id))
+    db.session.commit()
+    return redirect(url_for("user", user_id=friend_id))
+
+@app.route("/friend/<uuid:friend_id>/delete", methods=["POST"])
+@login_required
+def friend_delete(friend_id):
+    """フレンドを削除する関数"""
+    friend_id=str(friend_id)
+    db.session.delete(Friend.query.filter(Friend.user_id==current_user.id, Friend.friend_id==friend_id).first())
+    db.session.commit()
+    return redirect(url_for("user", user_id=friend_id))
+
+@app.route("/schedule")
+def schedule():
+    """時間割ページを表示する関数"""
+    return render_template("schedule.html")
+
+@app.route("/user/<uuid:user_id>")
+@login_required
+def user(user_id):
+    """ユーザーページを表示する関数"""
+    user_id=str(user_id)
+    user=User.query.filter(User.id==user_id).first()
+    friend=Friend.query.filter(Friend.user_id==current_user.id, Friend.friend_id==user_id).first()
+    if not user:
+        return redirect(url_for("home"))
+    posts=Post.query.filter(Post.user_id==str(user_id)).all()
+    return render_template("user.html", user=user.to_dict(), posts=list(map(lambda x: x.to_dict(), posts)), friend=friend)
+
+
 
 if __name__=="__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
