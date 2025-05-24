@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p class="text-2xl font-bold">{{ user.username}}</p>
+{% if current_user.is_authenticated %}
+    {% if friend %}
+    <form action="{{ url_for('friend_delete', friend_id=user.id) }}" method="post">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">フレンド解除</button>
+    </form>
+    {% else %}
+    <form action="{{ url_for('friend_add', friend_id=user.id) }}" method="post">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">フレンド追加</button>
+    </form>
+    {% endif %}
+{% endif %}
+{% for post in posts %}
+<div class="my-6 border-t border-gray-300"></div>
+<div class="px-4">
+<p class="text-lg font-bold">{{ post.title }}</p>
+<p class="text-sm text-gray-500">{{ post.created_at }}</p>
+<p class="text-sm text-gray-500">{{ post.content }}</p>
+</div>
+{% endfor %}
+{% endblock %}
+

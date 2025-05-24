@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash,check_password_hash
 
 app=Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"]="sqlite:///database.db"
-app.config["SECRET_KEY"]="aaaaaaa"
+app.config["SECRET_KEY"]="codemates1234567890"
 
 db=SQLAlchemy(app)
 
@@ -139,11 +139,9 @@ def index():
 @app.route("/home")
 def home():
     """ホームページを表示する関数"""
-def home():
     posts= Post.query.join(User).add_columns(User.username).all()
     return render_template("home.html", posts=posts)
 
-@login_required
 @app.route("/create", methods=["POST","GET"])
 @login_required
 def create():
@@ -167,7 +165,6 @@ def post(post_id):
     user=User.query.filter(User.id==post.user_id).first()
     return render_template("post.html", post=post.to_dict(), user=user.to_dict())
 
-@login_required
 @app.route("/post/<uuid:post_id>/delete", methods=["POST"])
 @login_required
 def delete(post_id):
