@@ -52,7 +52,7 @@ class User(db.Model,UserMixin):
     def get_id(self):
         return str(self.id)
     
-class Reactions(db.Model):
+class Reaction(db.Model):
     __tablename__="reactions"
     id=db.Column(db.String, primary_key=True, default=lambda x: str(uuid.uuid4()))
     post_id=db.Column(db.String, db.ForeignKey("posts.id"), nullable=False)
