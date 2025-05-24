@@ -128,6 +128,7 @@ login_manager.login_view="login"
 
 @login_manager.user_loader
 def load_user(user_id):
+    """ユーザーをロードする関数"""
     return User.query.filter(User.id==user_id).first()
 
 @app.route("/")
@@ -136,6 +137,7 @@ def index():
     return redirect(url_for("home"))
 
 @app.route("/home")
+def home():
     """ホームページを表示する関数"""
 def home():
     posts= Post.query.join(User).add_columns(User.username).all()
@@ -143,6 +145,7 @@ def home():
 
 @login_required
 @app.route("/create", methods=["POST","GET"])
+@login_required
 def create():
     """投稿を作成する関数"""
     if request.method=="POST":
@@ -166,6 +169,7 @@ def post(post_id):
 
 @login_required
 @app.route("/post/<uuid:post_id>/delete", methods=["POST"])
+@login_required
 def delete(post_id):
     """投稿を削除する関数"""
     if request.method=="POST":
