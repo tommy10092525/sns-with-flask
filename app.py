@@ -209,7 +209,7 @@ def signup():
         username=request.form.get("username")
         email=request.form.get("email")
         password=generate_password_hash(request.form.get("password"),method="pbkdf2:sha256")
-        user=User.query.filter(User.username==username or User.email==email).first()
+        user=User.query.filter(User.username==username).first()
         if user:
             return redirect(url_for("signup"))
         db.session.add(User(username=username, email=email, password=password))
