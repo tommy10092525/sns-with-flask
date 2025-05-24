@@ -82,6 +82,46 @@ class Friend(db.Model):
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S")
         }
 
+class Class(db.Model):
+    __tablename__="classes"
+    id=db.Column(db.String, primary_key=True, default=lambda x: str(uuid.uuid4()))
+    department=db.Column(db.String, nullable=False)
+    name=db.Column(db.String, nullable=False)
+    season=db.Column(db.String, nullable=False)
+    teacher=db.Column(db.String, nullable=False)
+    place=db.Column(db.String, nullable=False)
+    unit=db.Column(db.Integer, nullable=False)
+    url=db.Column(db.String, nullable=False)
+    created_at=db.Column(db.DateTime, default=datetime.now)
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "department": self.department,
+            "name": self.name,
+            "season": self.season,
+            "teacher": self.teacher,
+            "place": self.place,
+            "unit": self.unit,
+            "url": self.url,
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+class Class_entry(db.Model):
+    __tablename__="class_entries"
+    id=db.Column(db.String, primary_key=True, default=lambda x: str(uuid.uuid4()))
+    class_id=db.Column(db.String, db.ForeignKey("classes.id"), nullable=False)
+    user_id=db.Column(db.String, db.ForeignKey("users.id"), nullable=False)
+    created_at=db.Column(db.DateTime, default=datetime.now)
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "class_id": self.class_id,
+            "user_id": self.user_id,
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        }
+    
+
+
 login_manager=LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view="login"
