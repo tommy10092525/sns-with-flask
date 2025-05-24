@@ -10,8 +10,8 @@
 
 <body class="bg-gray-100 dark:bg-zinc-950 dark:text-white">
     <div class="my-8 mx-8 md:mx-auto max-w-3xl">
-        <div class="border-gray-300 border p-2 rounded-md flex gap-2 mb-4">
-            <a href="{{ url_for('index') }}" class="text-blue-500">投稿一覧</a>
+        <div class="border-gray-300 border p-2 rounded-md flex gap-2 mb-4 fixed top-0 left-0 right-0 backdrop-blur-sm max-w-3xl mx-auto mt-4">
+            <a href="{{ url_for('home') }}" class="text-blue-500">投稿一覧</a>
             <div class="border-gray-300 border-l"></div>
             {% if current_user.is_authenticated %}
             <p class="text-gray-500">{{ current_user.username }}としてログイン中</p>
@@ -23,8 +23,10 @@
             <a href="{{ url_for('signup') }}" class="text-gray-500 dark:text-white">新規登録</a>
             {% endif %}
         </div>
-        {% block content %}
-        {% endblock %}
+        <div class="mt-20">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
 </body>
 

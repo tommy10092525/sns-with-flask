@@ -63,8 +63,12 @@ def load_user(user_id):
 
 @app.route("/")
 def index():
+    return redirect(url_for("home"))
+
+@app.route("/home")
+def home():
     posts= Post.query.join(User).add_columns(User.username).all()
-    return render_template("index.html", posts=posts)
+    return render_template("home.html", posts=posts)
 
 @login_required
 @app.route("/create", methods=["POST","GET"])
@@ -76,7 +80,7 @@ def create():
         user_id=current_user.id
         db.session.add(Post(title=title, content=content, ip=ip, user_id=user_id))
         db.session.commit()
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
     else:
         return render_template("create.html")
 
@@ -94,12 +98,12 @@ def delete(post_id):
         post_id=str(post_id)
         post=Post.query.filter(Post.id==post_id).first()
         if post.user_id!=current_user.id:
-            return redirect(url_for("index"))
+            return redirect(url_for("home"))
         db.session.delete(post)
         db.session.commit()
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
     else:
-        return render_template("index.html")
+        return render_template("home.html")
 
 @app.route("/login", methods=["GET","POST"])
 def login():
@@ -110,7 +114,7 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             session["user_id"]=user.id
-            return redirect(url_for("index"))
+            return redirect(url_for("home"))
         else:
             return redirect(url_for("login"))
     else:
@@ -120,7 +124,7 @@ def login():
 def logout():
     logout_user()
     session.clear()
-    return redirect(url_for("index"))
+    return redirect(url_for("home"))
 
 @app.route("/signup", methods=["GET","POST"])
 def signup():
