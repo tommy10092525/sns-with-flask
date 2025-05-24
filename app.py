@@ -86,24 +86,32 @@ class Class(db.Model):
     __tablename__="classes"
     id=db.Column(db.String, primary_key=True, default=lambda x: str(uuid.uuid4()))
     department=db.Column(db.String, nullable=False)
+    year=db.Column(db.Integer, nullable=False)
+    code=db.Column(db.String, nullable=False)
     name=db.Column(db.String, nullable=False)
     season=db.Column(db.String, nullable=False)
-    teacher=db.Column(db.String, nullable=False)
+    time=db.Column(db.String, nullable=False)
     place=db.Column(db.String, nullable=False)
     unit=db.Column(db.Integer, nullable=False)
     url=db.Column(db.String, nullable=False)
-    created_at=db.Column(db.DateTime, default=datetime.now)
+    teacher=db.Column(db.String, nullable=False)
+    restriction=db.Column(db.String, nullable=False)
+    grading_criteria=db.Column(db.String, nullable=False)
     def to_dict(self):
         return {
             "id": self.id,
             "department": self.department,
+            "year": self.year,
+            "code": self.code,
             "name": self.name,
             "season": self.season,
-            "teacher": self.teacher,
+            "time": self.time,
             "place": self.place,
             "unit": self.unit,
             "url": self.url,
-            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            "teacher": self.teacher,
+            "restriction": self.restriction,
+            "grading_criteria": self.grading_criteria
         }
 
 class Class_entry(db.Model):
