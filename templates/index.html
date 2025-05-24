@@ -15,7 +15,7 @@
 {% endfor %}
 <div class="flex gap-3">
     {% if current_user.is_authenticated %}
-        <a href="{{ url_for('create_get') }}" class="bg-green-500 text-white px-4 py-2 rounded-md mt-4 mx-auto w-full">投稿作成</a>
+        <a href="{{ url_for('create') }}" class="bg-green-500 text-white px-4 py-2 rounded-md mt-4 mx-auto w-full">投稿作成</a>
     {% endif %}
 </div>
 {% endblock %}

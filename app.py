@@ -54,7 +54,7 @@ class User(db.Model,UserMixin):
 
 login_manager=LoginManager(app)
 login_manager.init_app(app)
-login_manager.login_view="login_get"
+login_manager.login_view="login"
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -67,20 +67,18 @@ def index():
     return render_template("index.html", posts=posts)
 
 @login_required
-@app.route("/create", methods=["POST"])
+@app.route("/create", methods=["POST","GET"])
 def create():
-    title=request.form.get("title")
-    content=request.form.get("content")
-    ip=request.remote_addr
-    user_id=current_user.id
-    db.session.add(Post(title=title, content=content, ip=ip, user_id=user_id))
-    db.session.commit()
-    return redirect(url_for("index"))
-
-@login_required
-@app.route("/create",methods=["GET"])
-def create_get():
-    return render_template("create.html")
+    if request.method=="POST":
+        title=request.form.get("title")
+        content=request.form.get("content")
+        ip=request.remote_addr
+        user_id=current_user.id
+        db.session.add(Post(title=title, content=content, ip=ip, user_id=user_id))
+        db.session.commit()
+        return redirect(url_for("index"))
+    else:
+        return render_template("create.html")
 
 @app.route("/post/<uuid:post_id>")
 def post(post_id):
@@ -92,29 +90,31 @@ def post(post_id):
 @login_required
 @app.route("/post/<uuid:post_id>/delete", methods=["POST"])
 def delete(post_id):
-    post_id=str(post_id)
-    post=Post.query.filter(Post.id==post_id).first()
-    if post.user_id!=current_user.id:
-        return redirect(url_for("index"))
-    db.session.delete(post)
-    db.session.commit()
-    return redirect(url_for("index"))
-
-@app.route("/login", methods=["GET"])
-def login_get():
-    return render_template("login.html")
-
-@app.route("/login", methods=["POST"])
-def login_post():
-    username=request.form.get("username")
-    password=request.form.get("password")
-    user=User.query.filter(User.username==username).first()
-    if user and user.check_password(password):
-        login_user(user)
-        session["user_id"]=user.id
+    if request.method=="POST":
+        post_id=str(post_id)
+        post=Post.query.filter(Post.id==post_id).first()
+        if post.user_id!=current_user.id:
+            return redirect(url_for("index"))
+        db.session.delete(post)
+        db.session.commit()
         return redirect(url_for("index"))
     else:
-        return redirect(url_for("login_get"))
+        return render_template("index.html")
+
+@app.route("/login", methods=["GET","POST"])
+def login():
+    if request.method=="POST":
+        username=request.form.get("username")
+        password=request.form.get("password")
+        user=User.query.filter(User.username==username).first()
+        if user and user.check_password(password):
+            login_user(user)
+            session["user_id"]=user.id
+            return redirect(url_for("index"))
+        else:
+            return redirect(url_for("login"))
+    else:
+        return render_template("login.html")
 
 @app.route("/logout")
 def logout():
@@ -122,21 +122,20 @@ def logout():
     session.clear()
     return redirect(url_for("index"))
 
-@app.route("/signup", methods=["GET"])
-def signup_get():
-    return render_template("signup.html")
-
-@app.route("/signup", methods=["POST"])
-def signup_post():
-    username=request.form.get("username")
-    email=request.form.get("email")
-    password=generate_password_hash(request.form.get("password"),method="pbkdf2:sha256")
-    user=User.query.filter(User.username==username or User.email==email).first()
-    if user:
-        return redirect(url_for("signup_get"))
-    db.session.add(User(username=username, email=email, password=password))
-    db.session.commit()
-    return redirect(url_for("login_get"))
+@app.route("/signup", methods=["GET","POST"])
+def signup():
+    if request.method=="POST":
+        username=request.form.get("username")
+        email=request.form.get("email")
+        password=generate_password_hash(request.form.get("password"),method="pbkdf2:sha256")
+        user=User.query.filter(User.username==username or User.email==email).first()
+        if user:
+            return redirect(url_for("signup"))
+        db.session.add(User(username=username, email=email, password=password))
+        db.session.commit()
+        return redirect(url_for("login"))
+    else:
+        return render_template("signup.html")
 
 if __name__=="__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
