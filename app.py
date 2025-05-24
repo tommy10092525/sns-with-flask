@@ -51,6 +51,36 @@ class User(db.Model,UserMixin):
         return check_password_hash(self.password, password)
     def get_id(self):
         return str(self.id)
+    
+class Reactions(db.Model):
+    __tablename__="reactions"
+    id=db.Column(db.String, primary_key=True, default=lambda x: str(uuid.uuid4()))
+    post_id=db.Column(db.String, db.ForeignKey("posts.id"), nullable=False)
+    user_id=db.Column(db.String, db.ForeignKey("users.id"), nullable=False)
+    reaction=db.Column(db.String, nullable=False)
+    created_at=db.Column(db.DateTime, default=datetime.now)
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "post_id": self.post_id,
+            "user_id": self.user_id,
+            "reaction": self.reaction,
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+class Friend(db.Model):
+    __tablename__="friends"
+    id=db.Column(db.String, primary_key=True, default=lambda x: str(uuid.uuid4()))
+    user_id=db.Column(db.String, db.ForeignKey("users.id"), nullable=False)
+    friend_id=db.Column(db.String, db.ForeignKey("users.id"), nullable=False)
+    created_at=db.Column(db.DateTime, default=datetime.now)
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "friend_id": self.friend_id,
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        }
 
 login_manager=LoginManager(app)
 login_manager.init_app(app)
