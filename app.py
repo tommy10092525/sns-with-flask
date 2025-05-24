@@ -132,9 +132,11 @@ def load_user(user_id):
 
 @app.route("/")
 def index():
+    """トップページにリダイレクトする関数"""
     return redirect(url_for("home"))
 
 @app.route("/home")
+    """ホームページを表示する関数"""
 def home():
     posts= Post.query.join(User).add_columns(User.username).all()
     return render_template("home.html", posts=posts)
@@ -142,8 +144,7 @@ def home():
 @login_required
 @app.route("/create", methods=["POST","GET"])
 def create():
-    if not current_user.is_authenticated:
-        return redirect(url_for("login"))
+    """投稿を作成する関数"""
     if request.method=="POST":
         title=request.form.get("title")
         content=request.form.get("content")
@@ -157,6 +158,7 @@ def create():
 
 @app.route("/post/<uuid:post_id>")
 def post(post_id):
+    """投稿を表示する関数"""
     post_id=str(post_id)
     post=Post.query.filter(Post.id==post_id).first()
     user=User.query.filter(User.id==post.user_id).first()
@@ -165,6 +167,7 @@ def post(post_id):
 @login_required
 @app.route("/post/<uuid:post_id>/delete", methods=["POST"])
 def delete(post_id):
+    """投稿を削除する関数"""
     if request.method=="POST":
         post_id=str(post_id)
         post=Post.query.filter(Post.id==post_id).first()
@@ -178,6 +181,7 @@ def delete(post_id):
 
 @app.route("/login", methods=["GET","POST"])
 def login():
+    """ログインページを表示する関数"""
     if request.method=="POST":
         username=request.form.get("username")
         password=request.form.get("password")
@@ -193,12 +197,14 @@ def login():
 
 @app.route("/logout")
 def logout():
+    """ログアウトする関数"""
     logout_user()
     session.clear()
     return redirect(url_for("home"))
 
 @app.route("/signup", methods=["GET","POST"])
 def signup():
+    """新規登録ページを表示する関数"""
     if request.method=="POST":
         username=request.form.get("username")
         email=request.form.get("email")
