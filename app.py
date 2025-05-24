@@ -60,7 +60,6 @@ login_manager.login_view="login"
 def load_user(user_id):
     return User.query.filter(User.id==user_id).first()
 
-
 @app.route("/")
 def index():
     return redirect(url_for("home"))
@@ -73,6 +72,8 @@ def home():
 @login_required
 @app.route("/create", methods=["POST","GET"])
 def create():
+    if not current_user.is_authenticated:
+        return redirect(url_for("login"))
     if request.method=="POST":
         title=request.form.get("title")
         content=request.form.get("content")
@@ -140,6 +141,10 @@ def signup():
         return redirect(url_for("login"))
     else:
         return render_template("signup.html")
+
+@app.route("/friend")
+def friend():
+    return render_template("friend.html")
 
 if __name__=="__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
