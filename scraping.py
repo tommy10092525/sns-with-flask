@@ -1,53 +1,123 @@
+from openpyxl import Workbook
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from bs4 import BeautifulSoup
 import requests
 from app import Class, db
 from app import app
 from urllib import parse
+import json
+import asyncio
 
+def get_class_info(row,department):
+    """
+    授業の情報を取得する
+    """
+    error=""
+    soup=BeautifulSoup(str(row),"html.parser")
+    # 授業コード
+    code=""
+    
+    code=soup.select_one("li  div.subjectListSummary > p:nth-child(2)").text.strip()
+    try:
+        code=code[code.find("：")+1:]
+    except:
+        code="取得不可"
+        error+=f"授業コード取得不可({soup.select_one("li  div.subjectListSummary > p:nth-child(2)").text.strip()})"
+    # 授業名
+    name=soup.select_one("li h3 > span.jp").text.strip()
+    # 開講時期
+    season=soup.select_one("li  div.subjectListSummary > p:nth-child(4)").text.strip()
+    season=season[season.find("：")+1:]
+    day=""
+    time=-1
+    if soup.select_one("li  div.subjectListSummary > p:nth-child(5)").text.strip().split("：")[1].find("集中・その他")!=-1:
+        day="集中・その他"
+        time=-10
+    else:
+        # 曜日
+        day=soup.select_one("li div.subjectListSummary > p:nth-child(5)").text.strip()
+        try:
+            day=day[day.find("：")+1:][0]
+            time=int(soup.select_one("li  div.subjectListSummary > p:nth-child(5)").text.strip().split("：")[1][1])
+        except:
+            day="取得不可"
+            error+=f"曜日取得不可({soup.select_one("li div.subjectListSummary > p:nth-child(5)").text.strip()})"
+            time=-1
+            error+=f"時限取得不可({soup.select_one("li  div.subjectListSummary > p:nth-child(5)").text.strip()})"
+    # 教員名
+    teacher=""
+    try:
+        teacher=soup.select_one("li  h4 > span.jp").text.strip()
+        teacher=teacher[teacher.find("：")+1:]
+    except:
+        teacher="取得不可"
+        error+=f"教員名取得不可({soup.select_one("li  h4 > span.jp").text.strip()})"
+    # 教室名
+    place=""
+    try:
+        place=soup.select_one("li  div.subjectListSummary > p:nth-child(6)").text.strip()
+        place=place[place.find("：")+1:]
+    except:
+        place="取得不可"
+        error+=f"教室名取得不可({soup.select_one("li  div.subjectListSummary > p:nth-child(6)").text.strip()})"
+    # 単位数
+    unit=-1
+    try:
+        unit=soup.select_one("li  div.subjectListSummary > p:nth-child(8)").text.strip()
+        unit=int(unit[unit.find("：")+1:])
+    except:
+        unit=-1
+        error+=f"単位数取得不可({soup.select_one("li  div.subjectListSummary > p:nth-child(8)").text.strip()})"
+    note=""
+    note=soup.select_one("li div.subjectListSummary > p:nth-child(9)").text.strip()
+    try:
+        note=note[note.find("：")+1:]
+    except:
+        error+=f"備考取得不可({soup.select_one("li div.subjectListSummary > p:nth-child(9)").text.strip()})"
+    # 配当年次
+    grade_min=-1
+    grade_max=-1
+    s=""
+    try:
+        s=soup.select_one("li div.subjectListSummary > p:nth-child(7)").text.strip()
+        if s.find("～")==-1 and s.find("・")==-1:
+            grade_min=int(s.split("：")[1])
+            grade_max=int(s.split("：")[1])
+        else:
+            s=s.replace("（","").replace("）","")
+            grade_min=int(s.split("：")[1][0])
+            grade_max=int(s.split("：")[1][2])
+    except:
+        grade_min=-1
+        grade_max=-1
+        error+=f"配当年次取得不可({s}) "
+    # シラバスURL
+    url=""
+    try:
+        url="https://syllabus.hosei.ac.jp/web/"+soup.select_one("li > a").attrs["href"]
+    except:
+        url="urlなし"
+    _class=Class(department=department,year=2025,code=code,name=name,season=season,time=time,place=place,url=url,teacher=teacher,unit=unit,grade_min=grade_min,grade_max=grade_max,note=note,day=day,error=error)
+    print(name,code,day,time,place,unit,grade_min,grade_max,note,error,sep="👹")
+    return _class
+    
 
-def get_class_info(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
-    department = soup.select("tr")[0].select("span.jp")[1].text.strip()
-    year = soup.select("tr")[2].select("td")[1].text.strip()
-    code = soup.select("tr")[3].select("td")[1].text.strip()
-    # htmlから科目名だけ位置を特定して無理やり取り出す
-    name = str(soup.select("h1")[0])
-    name = name[name.find("</div>")+8:name.find("／")]
-    teacher = soup.select("h2")[0].text.strip()
-    teacher = teacher[:teacher.find("（")]
-    season = soup.select("tr")[6].select("td")[1].text.strip()
-    time = soup.select("tr")[7].select("td")[1].text.strip()
-    time = time[:time.find("/")]
-    place = soup.select("tr")[10].select("td")[1].text.strip()
-    unit = soup.select("tr")[12].select("td")[1].text.strip()
-    restriction = soup.select("tr")[13].select("td")[1].text.strip()
-    grading_criteria = soup.select("div.subjectContents>span>span.jp>p")[
-        11].text.strip()
-    grading_criteria = grading_criteria[len(
-        r"【成績評価の方法と基準 / Grading criteria】\r\n")-2:]
-
-    _class = Class(department=department, year=year, code=code, name=name, season=season, time=time, place=place,
-                   url=url, teacher=teacher, unit=unit, restriction=restriction, grading_criteria=grading_criteria)
-    print(_class.to_dict())
-    # db.session.add(_class)
-    # db.session.commit()
 
 def get_class_list(department,page):
+    """
+    授業のリストを取得する
+    """
+    print(f"{department}の{page}ページ目を取得中")
     url=r"https://syllabus.hosei.ac.jp/web/web_search_show.php?search=show&nendo=2025&gakubu="+parse.quote(department)+"&page="+str(page)
-    print(url)
-    response=requests.get(url)
+    # スマホ版サイトをリクエストする
+    headers = {
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) > > AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1",
+        }
+    response=requests.get(url,headers=headers)
     soup=BeautifulSoup(response.text,"html.parser")
-    rows=soup.select("table>tr.jp")
-    class_list=[]
-    for row in rows:
-        try:
-            url="https://syllabus.hosei.ac.jp/web/"+row.attrs["data-href"]
-        except:
-            url="urlなし"
-        class_list.append(url)
-    return class_list
+    rows=soup.select("li.jp")
+    return list(map(lambda row:get_class_info(row,department),rows))
 
 DEPARTMENTS = [
     "法学部",
@@ -63,18 +133,26 @@ DEPARTMENTS = [
     "理工学部",
     "生命科学部",
     "グローバル教養学部",
-    "スポーツ健康学部"]
+    "スポーツ健康学部"
+    ]
 
-print(get_class_list(DEPARTMENTS[-1],1))
-# with app.app_context():
-#     db.create_all()
-#     db.session.commit()
+def main():
+    wb=Workbook()
+    ws=wb.active
+    ws.title="授業一覧"
+    ws.append(["学部","授業コード","授業名","開講時期","曜日","時限","教室名","単位数","配当年次_最小","配当年次_最大","シラバスURL","教員名","備考","エラー"])
+    for i in DEPARTMENTS:
+        cnt=1
+        while True:
+            class_list=get_class_list(i,cnt)
+            if len(class_list)==0:
+                print(f"{i}終わり") 
+                break
+            cnt+=1
+            for j in class_list:
+                ws.append([j.department,j.code,j.name,j.season,j.day,j.time,j.place,j.unit,j.grade_min,j.grade_max,j.url,j.teacher,j.note,j.error])
+    wb.save("授業一覧.xlsx")
 
-#     url = r"https://syllabus.hosei.ac.jp/web/web_search_show.php?search=show&nendo=2025&gakubu=%E7%B5%8C%E6%B8%88%E5%AD%A6%E9%83%A8"
 
-#     response = requests.get(url)
-#     soup = BeautifulSoup(response.text, "html.parser")
-#     rows = soup.select("tr.jp")
-#     for row in rows:
-#         url = "https://syllabus.hosei.ac.jp/web/"+row.attrs["data-href"]
-#         get_class_info(url)
+if __name__ == "__main__":
+    main()

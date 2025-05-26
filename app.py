@@ -85,18 +85,36 @@ class Friend(db.Model):
 class Class(db.Model):
     __tablename__="classes"
     id=db.Column(db.String, primary_key=True, default=lambda x: str(uuid.uuid4()))
+    """学部"""
     department=db.Column(db.String, nullable=False)
+    """年"""
     year=db.Column(db.Integer, nullable=False)
+    """授業コード"""
     code=db.Column(db.String, nullable=False)
+    """科目名"""
     name=db.Column(db.String, nullable=False)
+    """開講時期"""
     season=db.Column(db.String, nullable=False)
-    time=db.Column(db.String, nullable=False)
+    """時限"""
+    time=db.Column(db.Integer, nullable=False)
+    """曜日"""
+    day=db.Column(db.String, nullable=False)
+    """教室名称"""
     place=db.Column(db.String, nullable=False)
+    """単位"""
     unit=db.Column(db.Integer, nullable=False)
+    """シラバスURL"""
     url=db.Column(db.String, nullable=False)
+    """講師"""
     teacher=db.Column(db.String, nullable=False)
-    restriction=db.Column(db.String, nullable=False)
-    grading_criteria=db.Column(db.String, nullable=False)
+    """配当年次_最小"""
+    grade_min=db.Column(db.Integer, nullable=False)
+    """配当年次_最大"""
+    grade_max=db.Column(db.Integer, nullable=False)
+    """備考"""
+    note=db.Column(db.String, nullable=False)
+    """エラー"""
+    error=db.Column(db.String, nullable=False)
     def to_dict(self):
         return {
             "id": self.id,
@@ -106,12 +124,15 @@ class Class(db.Model):
             "name": self.name,
             "season": self.season,
             "time": self.time,
+            "day": self.day,
             "place": self.place,
             "unit": self.unit,
             "url": self.url,
             "teacher": self.teacher,
-            "restriction": self.restriction,
-            "grading_criteria": self.grading_criteria
+            "grade_min": self.grade_min,
+            "grade_max": self.grade_max,
+            "note": self.note,
+            "error": self.error
         }
 
 class Class_entry(db.Model):
