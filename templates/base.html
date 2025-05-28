@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+<html lang="ja">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <html>
 
 <head>
     <title>flaskテスト</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/js/tailwind.js"></script>
 </head>
 
 <body class="bg-gray-100 dark:bg-zinc-950 dark:text-white">
@@ -26,6 +27,12 @@
         <div class="mt-20">
             {% block content %}
             {% endblock %}
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center border border-gray-300 rounded-md p-2 m-4 bottom-0 left-0 right-0 backdrop-blur-sm max-w-3xl mx-auto fixed">
+            <a href="{{ url_for('home') }}" class="bg-blue-500/30 rounded-md text-white shadow py-3">ホーム</a>
+            <a href="{{ url_for('friend') }}" class="bg-blue-500/30 rounded-md text-white shadow py-3">フレンド</a>
+            <a href="{{ url_for('schedule') }}" class="bg-blue-500/30 rounded-md text-white shadow py-3">時間割</a>
+            <a href="#" class="bg-blue-500/30 rounded-md text-white shadow py-3 text-sm">アバウトミー</a>
         </div>
     </div>
 </body>
