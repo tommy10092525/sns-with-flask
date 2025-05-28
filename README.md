@@ -55,5 +55,126 @@
 
 前述のとおりロリポップサーバを利用する。Flaskのデプロイはノウハウが確立している。データベースは開発段階ではSQLite、本番環境ではMySQLを用いる。これらのデータベースの移行はORMを用いることに速やかに行うことができる。データベースの操作にはFlask用のORMライブラリであるflask-sqlalchemyを用いる。データベースの操作はORMを介して行い、生のSQLは使用しない。
 
+## データベース
 
+データベースは開発段階ではSQLite、本番環境ではMySQLを用いる。これらのデータベースの移行はORMを用いることに速やかに行うことができる。データベースの操作にはFlask用のORMライブラリであるflask-sqlalchemyを用いる。データベースの操作はORMを介して行い、生のSQLは使用しない。
+
+### テーブル
+
+テーブルは以下のとおりである。
+
+|テーブル名|説明|
+|---|---|
+|users|ユーザー情報|
+|posts|投稿情報|
+|reactions|投稿へのリアクション情報|
+|friends|フレンド情報|
+|classes|授業情報|
+|class_entries|授業の登録情報|
+
+#### usersテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|id|UUID|ユーザーID|
+|username|String|ユーザー名|
+|email|String|メールアドレス|
+|password|String|パスワード|
+|created_at|DateTime|作成日時|
+|department|String|学部|
+
+#### postsテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|id|UUID|投稿ID|
+|title|String|タイトル|
+|content|String|内容|
+|ip|String|IPアドレス|
+|created_at|DateTime|作成日時|
+|user_id|UUID|ユーザーID|
+
+#### reactionsテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|id|UUID|リアクションID|
+|post_id|UUID|投稿ID|
+|user_id|UUID|ユーザーID|
+|reaction|String|リアクション|
+|created_at|DateTime|作成日時|
+
+#### friendsテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|id|UUID|フレンドID|
+|user_id|UUID|ユーザーID|
+|friend_id|UUID|フレンドID|
+|created_at|DateTime|作成日時|
+
+#### classesテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|id|UUID|授業ID|
+|department|String|学部|
+|year|Integer|年|
+|code|String|授業コード|
+|name|String|科目名|
+|season|String|開講時期|
+|time|Integer|時限|
+|day|String|曜日|
+|place|String|教室|
+|unit|Integer|単位数|
+|url|String|シラバスURL|
+|teacher|String|講師|
+|grade_min|Integer|配当年次_最小|
+|grade_max|Integer|配当年次_最大|
+|note|String|備考|
+|error|String|エラー|
+|is_spring|Boolean|春学期かどうか|
+|is_autumn|Boolean|秋学期かどうか|
+
+#### class_entriesテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|id|UUID|授業登録ID|
+|class_id|UUID|授業ID|
+|user_id|UUID|ユーザーID|
+|created_at|DateTime|作成日時|
+
+### テーブルの関係
+
+テーブルの関係は以下のとおりである。
+
+```
+users
+  - posts
+  - reactions
+  - friends
+  - classes
+  - class_entries
+```
+```
+posts
+  - reactions
+```
+```
+reactions
+  - posts
+```
+```
+friends
+  - users
+```
+```
+classes
+  - class_entries
+```
+```
+class_entries
+  - classes
+```
 
