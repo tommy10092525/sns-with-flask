@@ -99,7 +99,8 @@ def get_class_info(row,department):
     except:
         url="urlなし"
     _class=Class(department=department,year=2025,code=code,name=name,season=season,time=time,place=place,url=url,teacher=teacher,unit=unit,grade_min=grade_min,grade_max=grade_max,note=note,day=day,error=error)
-    print(name,code,day,time,place,unit,grade_min,grade_max,note,error,sep="👹")
+    print(name,code,season,error,_class.is_spring,_class.is_autumn,sep="★")
+    db.session.add(_class)
     return _class
     
 
@@ -137,21 +138,23 @@ DEPARTMENTS = [
     ]
 
 def main():
-    wb=Workbook()
-    ws=wb.active
-    ws.title="授業一覧"
-    ws.append(["学部","授業コード","授業名","開講時期","曜日","時限","教室名","単位数","配当年次_最小","配当年次_最大","シラバスURL","教員名","備考","エラー"])
-    for i in DEPARTMENTS:
-        cnt=1
-        while True:
-            class_list=get_class_list(i,cnt)
-            if len(class_list)==0:
-                print(f"{i}終わり") 
-                break
-            cnt+=1
-            for j in class_list:
-                ws.append([j.department,j.code,j.name,j.season,j.day,j.time,j.place,j.unit,j.grade_min,j.grade_max,j.url,j.teacher,j.note,j.error])
-    wb.save("授業一覧.xlsx")
+    with app.app_context():
+        wb=Workbook()
+        ws=wb.active
+        ws.title="授業一覧"
+        ws.append(["学部","授業コード","授業名","開講時期","曜日","時限","教室名","単位数","配当年次_最小","配当年次_最大","シラバスURL","教員名","備考","エラー"])
+        for i in DEPARTMENTS:
+            cnt=1
+            while True:
+                class_list=get_class_list(i,cnt)
+                if len(class_list)==0:
+                    print(f"{i}終わり") 
+                    break
+                cnt+=1
+                for j in class_list:
+                    ws.append([j.department,j.code,j.name,j.season,j.day,j.time,j.place,j.unit,j.grade_min,j.grade_max,j.url,j.teacher,j.note,j.error])
+                db.session.commit()
+        wb.save("授業一覧.xlsx")
 
 
 if __name__ == "__main__":

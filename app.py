@@ -84,6 +84,7 @@ class Friend(db.Model):
 
 class Class(db.Model):
     __tablename__="classes"
+
     id=db.Column(db.String, primary_key=True, default=lambda x: str(uuid.uuid4()))
     """学部"""
     department=db.Column(db.String, nullable=False)
@@ -96,7 +97,7 @@ class Class(db.Model):
     """開講時期"""
     season=db.Column(db.String, nullable=False)
     """時限"""
-    time=db.Column(db.Integer, nullable=False)
+    time=db.Column(db.String, nullable=False)
     """曜日"""
     day=db.Column(db.String, nullable=False)
     """教室名称"""
@@ -115,6 +116,10 @@ class Class(db.Model):
     note=db.Column(db.String, nullable=False)
     """エラー"""
     error=db.Column(db.String, nullable=False)
+    """春学期かどうか"""
+    is_spring=db.Column(db.Boolean, nullable=False)
+    """秋学期かどうか"""
+    is_autumn=db.Column(db.Boolean, nullable=False)
     def to_dict(self):
         return {
             "id": self.id,
@@ -134,6 +139,34 @@ class Class(db.Model):
             "note": self.note,
             "error": self.error
         }
+    def __init__(self,department,year,code,name,season,time,day,place,unit,url,teacher,grade_min,grade_max,note,error):
+        self.department=department
+        self.year=year
+        self.code=code
+        self.name=name
+        self.season=season
+        self.time=time
+        self.day=day
+        self.place=place
+        self.unit=unit
+        self.url=url
+        self.teacher=teacher
+        self.grade_min=grade_min
+        self.grade_max=grade_max
+        self.note=note
+        self.error=error
+        if season in ["年間授業/Yearly","春学期・秋学期/Spring・Fall"]:
+            self.is_spring=True
+            self.is_autumn=True
+        elif season in ["春学期授業/Spring"]:
+            self.is_spring=True
+            self.is_autumn=False
+        elif season in ["秋学期授業/Fall"]:
+            self.is_spring=False
+            self.is_autumn=True
+        else:
+            self.is_spring=False
+            self.is_autumn=False
 
 class Class_entry(db.Model):
     __tablename__="class_entries"
@@ -298,7 +331,31 @@ def user(user_id):
     posts=Post.query.filter(Post.user_id==str(user_id)).all()
     return render_template("user.html", user=user.to_dict(), posts=list(map(lambda x: x.to_dict(), posts)), friend=friend)
 
-
+@app.route("/classes")
+def classes():
+    name=request.args.get("name")
+    code=request.args.get("code")
+    department=request.args.get("department")
+    time=request.args.get("time")
+    day=request.args.get("day")
+    season=request.args.get("season")
+    filters=[]
+    if season=="spring":
+        filters.append(Class.is_spring==True)
+    elif season=="autumn":
+        filters.append(Class.is_autumn==True)
+    if name:
+        filters.append(Class.name.like(f"%{name}%"))
+    if code:
+        filters.append(Class.code.like(f"%{code}%"))
+    if department:
+        filters.append(Class.department==department)
+    if time:
+        filters.append(Class.time==time)
+    if day:
+        filters.append(Class.day==day)
+    classes=Class.query.filter(*filters).all()
+    return render_template("classes.html", classes=list(map(lambda x: x.to_dict(), classes)))
 
 if __name__=="__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

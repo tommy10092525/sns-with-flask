@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>授業一覧</h1>
+<div class="flex flex-wrap">
+    {% for class in classes %}
+    <div class="border border-gray-300 rounded-md p-4">
+        <h2 class="text-lg font-bold">{{ class.name }}</h2>
+        <p class="text-sm text-gray-500">{{ class.code }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
