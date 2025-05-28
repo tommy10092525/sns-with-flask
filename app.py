@@ -40,12 +40,14 @@ class User(db.Model,UserMixin):
     email=db.Column(db.String, nullable=False)
     password=db.Column(db.String, nullable=False)
     created_at=db.Column(db.DateTime, default=datetime.now)
+    department=db.Column(db.String)
     def to_dict(self):
         return {
             "id": self.id,
             "username": self.username,
             "email": self.email,
-            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "department": self.department
         }
     def check_password(self, password):
         return check_password_hash(self.password, password)
@@ -97,7 +99,7 @@ class Class(db.Model):
     """開講時期"""
     season=db.Column(db.String, nullable=False)
     """時限"""
-    time=db.Column(db.String, nullable=False)
+    time=db.Column(db.Integer, nullable=False)
     """曜日"""
     day=db.Column(db.String, nullable=False)
     """教室名称"""
@@ -137,7 +139,9 @@ class Class(db.Model):
             "grade_min": self.grade_min,
             "grade_max": self.grade_max,
             "note": self.note,
-            "error": self.error
+            "error": self.error,
+            "is_spring": self.is_spring,
+            "is_autumn": self.is_autumn
         }
     def __init__(self,department,year,code,name,season,time,day,place,unit,url,teacher,grade_min,grade_max,note,error):
         self.department=department
@@ -315,9 +319,17 @@ def friend_delete(friend_id):
     return redirect(url_for("user", user_id=friend_id))
 
 @app.route("/schedule")
+@login_required
 def schedule():
     """時間割ページを表示する関数"""
-    return render_template("schedule.html")
+    classes=Class_entry.query.filter(Class_entry.user_id==current_user.id).all()
+    classes_list=[]
+    for class_entry in classes:
+        class_detail=Class.query.filter(Class.id==class_entry.class_id).first()
+        class_detail_dict=class_detail.to_dict()
+        classes_list.append(class_detail_dict)
+    classes_list.sort(key=lambda x: x["time"])
+    return render_template("schedule.html", classes=classes_list)
 
 @app.route("/user/<uuid:user_id>")
 @login_required
@@ -339,11 +351,15 @@ def classes():
     time=request.args.get("time")
     day=request.args.get("day")
     season=request.args.get("season")
+    teacher=request.args.get("teacher")
     filters=[]
     if season=="spring":
         filters.append(Class.is_spring==True)
     elif season=="autumn":
         filters.append(Class.is_autumn==True)
+    elif season=="other":
+        filters.append(Class.is_spring==False)
+        filters.append(Class.is_autumn==False)
     if name:
         filters.append(Class.name.like(f"%{name}%"))
     if code:
@@ -352,10 +368,38 @@ def classes():
         filters.append(Class.department==department)
     if time:
         filters.append(Class.time==time)
-    if day:
+    if day: 
         filters.append(Class.day==day)
-    classes=Class.query.filter(*filters).all()
+    if teacher:
+        filters.append(Class.teacher.like(f"%{teacher}%"))
+    classes=Class.query.filter(*filters).limit(1000).all()
     return render_template("classes.html", classes=list(map(lambda x: x.to_dict(), classes)))
 
+@app.route("/class/<uuid:class_id>")
+def class_detail(class_id):
+    """授業詳細ページを表示する関数"""
+    class_id=str(class_id)
+    class_detail=Class.query.filter(Class.id==class_id).first()
+    class_entry=Class_entry.query.filter(Class_entry.class_id==class_id,Class_entry.user_id==current_user.id).first()
+    return render_template("class_detail.html", class_detail=class_detail.to_dict(),class_entry=class_entry)
+
+@app.route("/class/<uuid:class_id>/add", methods=["GET"])
+@login_required
+def class_add(class_id):
+    """授業を時間割に追加する関数"""
+    class_id=str(class_id)
+    db.session.add(Class_entry(user_id=current_user.id, class_id=class_id))
+    db.session.commit()
+    return redirect(url_for("schedule"))
+
+@app.route("/class/<uuid:class_id>/delete",methods=["GET"])
+@login_required
+def class_delete(class_id):
+    """授業を時間割から削除する関数"""
+    class_id=str(class_id)
+    class_entry=Class_entry.query.filter(Class_entry.class_id==class_id,Class_entry.user_id==current_user.id).first()
+    db.session.delete(class_entry)
+    db.session.commit()
+    return redirect(url_for("schedule"))
 if __name__=="__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
