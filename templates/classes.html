@@ -2,13 +2,17 @@
 
 {% block content %}
 <h1>授業一覧</h1>
-<div class="flex flex-wrap">
+<div class="flex flex-wrap gap-1 mb-40">
     {% for class in classes %}
     <div class="border border-gray-300 rounded-md p-4">
-        <h2 class="text-lg font-bold">{{ class.name }}</h2>
-        <p class="text-sm text-gray-500">{{ class.code }}</p>
+        <a href="{{ url_for('class_detail', class_id=class.id) }}">
+            <p class="text-sm text-gray-500">{{ class.department }}</p>
+            <h2 class="text-md font-bold">{{ class.name }}</h2>
+            <p class="text-sm text-gray-500">{{ class.code }}</p>
+        </a>
     </div>
     {% endfor %}
 </div>
+
 {% endblock %}
 
