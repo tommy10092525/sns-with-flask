@@ -7,180 +7,92 @@
         <p class="text-center text-xl">春学期</p>
         <table class="border border-gray-300 rounded-md overflow-scroll">
             <thead>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th class="border border-gray-300 rounded-md "></th>
-                    <th class="border border-gray-300 rounded-md ">月</th>
-                    <th class="border border-gray-300 rounded-md ">火</th>
-                    <th class="border border-gray-300 rounded-md ">水</th>
-                    <th class="border border-gray-300 rounded-md ">木</th>
-                    <th class="border border-gray-300 rounded-md ">金</th>
-                    <th class="border border-gray-300 rounded-md ">土</th>
+                <tr class="border border-gray-300 rounded-md">
+                    {% for i in ["","月","火","水","木","金","土"] %}
+                    <th class="border border-gray-300 rounded-md">{{i}}</th>
+                    {% endfor %}
                 </tr>
             </thead>
-            <tbody class="border border-gray-300 rounded-md  text-center">
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">1限</th>
-                    <td class="border border-gray-300 rounded-md "><a href="" class="text-blue-500">追加</a></td>
-                    <td class="border border-gray-300 rounded-md "><a href="" class="text-blue-500">追加</a></td>
-                    <td class="border border-gray-300 rounded-md "><a href="" class="text-blue-500">追加</a></td>
-                    <td class="border border-gray-300 rounded-md "><a href="" class="text-blue-500">追加</a></td>
-                    <td class="border border-gray-300 rounded-md "><a href="" class="text-blue-500">追加</a></td>
-                    <td class="border border-gray-300 rounded-md "><a href="" class="text-blue-500">追加</a></td>
-                </tr>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">2限</th>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                </tr>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">3限</th>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                </tr>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">4限</th>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                </tr>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">5限</th>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                </tr>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">6限</th>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                </tr>
+            <tbody class="border border-gray-300 rounded-md text-center">
+                {% for time in range(1,7) %}
+                    <tr class="border border-gray-300 rounded-md ">
+                        <th scope="row" class="border border-gray-300 rounded-md ">{{time}}限</th>
+                        {% for day in ['月','火','水','木','金','土'] %}
+                        <td class="border border-gray-300 rounded-md p-2">
+                            <a
+                                href="{{url_for('classes',season='spring',time=time,day=day)}}"
+                                class="rounded-md bg-blue-500 text-white px-2 py-1">追加</a> 
+                            {% for class in classes %}
+                            {% if class.time==time and class.day==day and class.is_spring==True%}
+                            <a href="{{url_for('class_detail',class_id=class.id)}}" class="text-blue-500 block">{{class.name}}</a>
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
         <p class="text-center">集中・その他</p>
-        <div class="border border-gray-300 rounded-md min-h-20">
+        <div class="border border-gray-300 rounded-md min-h-20 w-full p-2">
+            <a href="{{url_for('classes',season='spring',time=-10)}}" class="rounded-md text-white bg-blue-500 px-2 py-1">追加</a>
+            {% for class in classes %}
+            {% if class.time==-10 and class.is_spring==True %}
+            <a href="{{url_for('class_detail',class_id=class.id)}}" class="text-blue-500 block">{{class.name}}</a>
+            {% endif %}
+            {% endfor %}
         </div>
     </div>
     <div class="bg-white dark:bg-zinc-900 rounded-md p-2 border border-gray-300 mt-2 overflow-scroll">
         <p class="text-center text-xl">秋学期</p>
-        <table class="border border-gray-300 rounded-md w-full">
+        <table class="border border-gray-300 rounded-md overflow-scroll">
             <thead>
                 <tr class="border border-gray-300 rounded-md ">
-                    <th class="border border-gray-300 rounded-md "></th>
-                    <th class="border border-gray-300 rounded-md ">月</th>
-                    <th class="border border-gray-300 rounded-md ">火</th>
-                    <th class="border border-gray-300 rounded-md ">水</th>
-                    <th class="border border-gray-300 rounded-md ">木</th>
-                    <th class="border border-gray-300 rounded-md ">金</th>
-                    <th class="border border-gray-300 rounded-md ">土</th>
+                    {% for i in ["","月","火","水","木","金","土"] %}
+                    <th class="border border-gray-300 rounded-md">{{i}}</th>
+                    {% endfor %}
                 </tr>
             </thead>
-            <tbody class="border border-gray-300 rounded-md  text-center">
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">1限</th>
-                    <td class="border border-gray-300 rounded-md "><a href="" class="text-blue-500">追加</a>
-                        <p class="text-sm">【F401】Topics in Japanese Literature: History of Japanese Literature in Translation</p>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                    </td>
-                    <td class="border border-gray-300 rounded-md ">
-                        <a href="" class="text-blue-500">追加</a>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                    </td>
-                    <td class="border border-gray-300 rounded-md ">
-                        <a href="" class="text-blue-500">追加</a>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                    </td>
-                    <td class="border border-gray-300 rounded-md ">
-                        <a href="" class="text-blue-500">追加</a>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                    </td>
-                    <td class="border border-gray-300 rounded-md ">
-                        <a href="" class="text-blue-500">追加</a>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                    </td>
-                    <td class="border border-gray-300 rounded-md ">
-                        <a href="" class="text-blue-500">追加</a>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                        <p class="text-[8px]">授業の名前aaaaaaaaaaa</p>
-                    </td>
-                </tr>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">2限</th>
-                    <td class="border border-gray-300 rounded-md ">
-                        <p class="text-sm">[F401]Topics in Japanese Literature: History of Japanese Literature in Translation</p>
-                    </td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                </tr>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">3限</th>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                </tr>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">4限</th>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                </tr>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">5限</th>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                </tr>
-                <tr class="border border-gray-300 rounded-md ">
-                    <th scope="row" class="border border-gray-300 rounded-md ">6限</th>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                    <td class="border border-gray-300 rounded-md "></td>
-                </tr>
+            <tbody class="border border-gray-300 rounded-md text-center">
+                {% for i in range(1,7) %}
+                    <tr class="border border-gray-300 rounded-md ">
+                        <th scope="row" class="border border-gray-300 rounded-md ">{{i}}限</th>
+                        {% for day in ['月','火','水','木','金','土'] %}
+                            <td class="border border-gray-300 rounded-md p-2">
+                            <a href="{{url_for('classes',season='autumn',time=i,day=day)}}"
+                                    class="rounded-md bg-blue-500 text-white px-2 py-1">追加</a>
+                            {% for class in classes %}
+                            {% if class.time==i and class.day==day and class.is_autumn==True%}
+                            <a href="{{url_for('class_detail',class_id=class.id)}}" class="text-blue-500 block">{{class.name}}</a>
+                            {% endif %}
+                            {% endfor %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
         <p class="text-center">集中・その他</p>
-        <div class="border border-gray-300 rounded-md min-h-20">
+        <div class="border border-gray-300 rounded-md min-h-20 w-full p-2">
+            <a href="{{url_for('classes',season='autumn',time=-1)}}" class="rounded-md bg-blue-500 text-white px-2 py-1">追加</a>
+            {% for class in classes %}
+            {% if class.time==-1 and class.is_autumn==True %}
+            <a href="{{url_for('class_detail',class_id=class.id)}}" class="text-blue-500 block">{{class.name}}</a>
+            {% endif %}
+            {% endfor %}
         </div>
     </div>
     <div class="bg-white dark:bg-zinc-900 rounded-md p-2 border border-gray-300 mt-2">
         <p class="text-center text-xl">「春学期」・「秋学期」に分類されないもの</p>
-        <div class="border border-gray-300 rounded-md min-h-20">
+        <div class="border border-gray-300 rounded-md min-h-20 w-full p-2">
+            <a href="{{url_for('classes',season='other')}}" class="text-white bg-blue-500 px-2 py-1 rounded-md">追加</a>
+            {% for class in classes %}
+            {% if class.time==-10 and class.is_autumn==False and class.is_spring==False %}
+            <a href="{{url_for('class_detail',class_id=class.id)}}" class="text-blue-500 block">{{class.name}}</a>
+            {% endif %}
+            {% endfor %}
         </div>
     </div>
     <div class="mb-40"></div>
-</div>
-<div
-    class="grid grid-cols-2 md:grid-cols-4 ga text-center border border-gray-300 rounded-md p-2 m-4 bottom-0 left-0 right-0 backdrop-blur-sm max-w-3xl mx-auto fixed gap-2">
-    <a href="{{ url_for('home') }}" class="bg-blue-500/30 rounded-md text-white shadow py-3">ホーム</a>
-    <a href="{{ url_for('friend') }}" class="bg-blue-500/30 rounded-md text-white shadow py-3">フレンド</a>
-    <a href="{{ url_for('schedule') }}" class="bg-blue-500/60 rounded-md text-white shadow py-3">時間割</a>
-    <a href="#" class="bg-blue-500/30 rounded-md text-white shadow py-3 text-sm">アバウトミー</a>
 </div>
 {% endblock %}
