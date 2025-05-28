@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center">
+    <table class="border border-gray-300 rounded-md text-center">
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">授業名</td>
+            <td class="border border-gray-300 rounded-md">{{class_detail.name}}</td>
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">授業コード</td>
+            <td class="border border-gray-300 rounded-md">{{class_detail.code}}</td>
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">学部</td>
+            <td class="border border-gray-300 rounded-md">{{class_detail.department}}</td>
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">時限</td>
+            {% if class_detail.time==-10 %}
+            <td class="border border-gray-300 rounded-md">集中・その他</td>
+            {% elif class_detail.time==-1 %}
+            <td class="border border-gray-300 rounded-md">？</td>
+            {% else %}
+            <td class="border border-gray-300 rounded-md">{{class_detail.time}}</td>
+            {% endif %}
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">曜日</td>
+            <td class="border border-gray-300 rounded-md">{{class_detail.day}}</td>
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">教室</td>
+            <td class="border border-gray-300 rounded-md">{{class_detail.place}}</td>
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">単位</td>
+            {% if class_detail.unit==-1 %}
+            <td class="border border-gray-300 rounded-md">？</td>
+            {% else %}
+            <td class="border border-gray-300 rounded-md">{{class_detail.unit}}</td>
+            {% endif %}
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">講師</td>
+            <td class="border border-gray-300 rounded-md">{{class_detail.teacher}}</td>
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">配当年次_最小</td>
+            {% if class_detail.grade_min==-1 %}
+            <td class="border border-gray-300 rounded-md">？</td>
+            {% else %}
+            <td class="border border-gray-300 rounded-md">{{class_detail.grade_min}}</td>
+            {% endif %}
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">配当年次_最大</td>
+            {% if class_detail.grade_max==-1 %}
+            <td class="border border-gray-300 rounded-md">？</td>
+            {% else %}
+            <td class="border border-gray-300 rounded-md">{{class_detail.grade_max}}</td>
+            {% endif %}
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">シラバスURL</td>
+            {% if class_detail.url=="urlなし" %}
+            <td class="border border-gray-300 rounded-md">？</td>
+            {% else %}
+            <td class="border border-gray-300 rounded-md"><a href="{{class_detail.url}}" class="text-blue-500 hover:text-blue-700">シラバスURL</a></td>
+            {% endif %}
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">備考</td>
+            <td class="border border-gray-300 rounded-md">{{class_detail.note}}</td>
+        </tr>
+        <tr class="border border-gray-300 rounded-md">
+            <td class="border border-gray-300 rounded-md">エラー</td>
+            <td class="border border-gray-300 rounded-md">{{class_detail.error}}</td>
+        </tr>
+    </table>
+</div>
+{% if class_entry==None %}
+<a href="{{url_for('class_add',class_id=class_detail.id)}}" class="bg-blue-500 text-white px-4 py-2 rounded-md">授業を登録する</a>
+{% else %}
+<a href="{{url_for('class_delete',class_id=class_detail.id)}}" class="bg-red-500 text-white px-4 py-2 rounded-md">授業を削除する</a>
+{% endif %}
+<a href="{{url_for('schedule')}}" class="text-blue-500 hover:text-blue-700">時間割に戻る</a>
+{% endblock %}
