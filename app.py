@@ -275,11 +275,12 @@ def signup():
     if request.method=="POST":
         username=request.form.get("username")
         email=request.form.get("email")
+        department=request.form.get("department")
         password=generate_password_hash(request.form.get("password"),method="pbkdf2:sha256")
         user=User.query.filter(User.username==username).first()
         if user:
             return redirect(url_for("signup"))
-        db.session.add(User(username=username, email=email, password=password))
+        db.session.add(User(username=username, email=email, password=password, department=department))
         db.session.commit()
         return redirect(url_for("login"))
     else:
@@ -324,12 +325,13 @@ def schedule():
     """時間割ページを表示する関数"""
     classes=Class_entry.query.filter(Class_entry.user_id==current_user.id).all()
     classes_list=[]
+    user=User.query.filter(User.id==current_user.id).first()
     for class_entry in classes:
         class_detail=Class.query.filter(Class.id==class_entry.class_id).first()
         class_detail_dict=class_detail.to_dict()
         classes_list.append(class_detail_dict)
     classes_list.sort(key=lambda x: x["time"])
-    return render_template("schedule.html", classes=classes_list)
+    return render_template("schedule.html", classes=classes_list, user=user.to_dict())
 
 @app.route("/user/<uuid:user_id>")
 @login_required
@@ -401,5 +403,22 @@ def class_delete(class_id):
     db.session.delete(class_entry)
     db.session.commit()
     return redirect(url_for("schedule"))
+
+@app.route("/aboutme", methods=["POST","GET"])
+@login_required
+def aboutme():
+    """アバウトミーのページを表示する関数"""
+    if request.method=="POST":
+        name=request.form.get("name")
+        department=request.form.get("department")
+        user=User.query.filter(User.id==current_user.id).first()
+        user.name=name
+        user.department=department
+        db.session.commit()
+        return redirect(url_for("aboutme"))
+    else:
+        user=User.query.filter(User.id==current_user.id).first()
+        return render_template("aboutme.html", user=user.to_dict())
+
 if __name__=="__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

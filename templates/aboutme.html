@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>アバウトミー</h1>
+<form action="{{ url_for('aboutme') }}" method="post">
+    <input class="border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:text-white" type="text" name="name" placeholder="名前" value="{{ user.name }}">
+    <input class="border border-gray-300 rounded-md p-2 dark:bg-gray-800 dark:text-white" type="text" name="department" placeholder="学部" value="{{ user.department }}">
+    <button class="bg-blue-500 text-white px-4 py-2 rounded-md" type="submit">更新</button>
+</form>
+{% endblock %}
+

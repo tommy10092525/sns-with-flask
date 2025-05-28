@@ -20,7 +20,7 @@
                         {% for day in ['月','火','水','木','金','土'] %}
                         <td class="border border-gray-300 rounded-md p-2">
                             <a
-                                href="{{url_for('classes',season='spring',time=time,day=day)}}"
+                                href="{{url_for('classes',season='spring',time=time,day=day,department=user.department)}}"
                                 class="rounded-md bg-blue-500 text-white px-2 py-1">追加</a> 
                             {% for class in classes %}
                             {% if class.time==time and class.day==day and class.is_spring==True%}
@@ -35,7 +35,7 @@
         </table>
         <p class="text-center">集中・その他</p>
         <div class="border border-gray-300 rounded-md min-h-20 w-full p-2">
-            <a href="{{url_for('classes',season='spring',time=-10)}}" class="rounded-md text-white bg-blue-500 px-2 py-1">追加</a>
+            <a href="{{url_for('classes',season='spring',time=-10,department=user.department)}}" class="rounded-md text-white bg-blue-500 px-2 py-1">追加</a>
             {% for class in classes %}
             {% if class.time==-10 and class.is_spring==True %}
             <a href="{{url_for('class_detail',class_id=class.id)}}" class="text-blue-500 block">{{class.name}}</a>
@@ -59,7 +59,7 @@
                         <th scope="row" class="border border-gray-300 rounded-md ">{{i}}限</th>
                         {% for day in ['月','火','水','木','金','土'] %}
                             <td class="border border-gray-300 rounded-md p-2">
-                            <a href="{{url_for('classes',season='autumn',time=i,day=day)}}"
+                            <a href="{{url_for('classes',season='autumn',time=i,day=day,department=user.department)}}"
                                     class="rounded-md bg-blue-500 text-white px-2 py-1">追加</a>
                             {% for class in classes %}
                             {% if class.time==i and class.day==day and class.is_autumn==True%}
@@ -74,7 +74,7 @@
         </table>
         <p class="text-center">集中・その他</p>
         <div class="border border-gray-300 rounded-md min-h-20 w-full p-2">
-            <a href="{{url_for('classes',season='autumn',time=-10)}}" class="rounded-md bg-blue-500 text-white px-2 py-1">追加</a>
+            <a href="{{url_for('classes',season='autumn',time=-10,department=user.department)}}" class="rounded-md bg-blue-500 text-white px-2 py-1">追加</a>
             {% for class in classes %}
             {% if class.time==-10 and class.is_autumn==True %}
             <a href="{{url_for('class_detail',class_id=class.id)}}" class="text-blue-500 block">{{class.name}}</a>
@@ -85,9 +85,9 @@
     <div class="bg-white dark:bg-zinc-900 rounded-md p-2 border border-gray-300 mt-2">
         <p class="text-center text-xl">「春学期」・「秋学期」に分類されないもの</p>
         <div class="border border-gray-300 rounded-md min-h-20 w-full p-2">
-            <a href="{{url_for('classes',season='other')}}" class="text-white bg-blue-500 px-2 py-1 rounded-md">追加</a>
+            <a href="{{url_for('classes',season='other',department=user.department)}}" class="text-white bg-blue-500 px-2 py-1 rounded-md">追加</a>
             {% for class in classes %}
-            {% if class.time==-10 and class.is_autumn==False and class.is_spring==False %}
+            {% if class.time==-10 and class.is_autumn==False and class.is_spring==False%}
             <a href="{{url_for('class_detail',class_id=class.id)}}" class="text-blue-500 block">{{class.name}}</a>
             {% endif %}
             {% endfor %}
