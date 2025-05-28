@@ -74,9 +74,9 @@
         </table>
         <p class="text-center">集中・その他</p>
         <div class="border border-gray-300 rounded-md min-h-20 w-full p-2">
-            <a href="{{url_for('classes',season='autumn',time=-1)}}" class="rounded-md bg-blue-500 text-white px-2 py-1">追加</a>
+            <a href="{{url_for('classes',season='autumn',time=-10)}}" class="rounded-md bg-blue-500 text-white px-2 py-1">追加</a>
             {% for class in classes %}
-            {% if class.time==-1 and class.is_autumn==True %}
+            {% if class.time==-10 and class.is_autumn==True %}
             <a href="{{url_for('class_detail',class_id=class.id)}}" class="text-blue-500 block">{{class.name}}</a>
             {% endif %}
             {% endfor %}
